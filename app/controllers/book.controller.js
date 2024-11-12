@@ -1,4 +1,4 @@
-const bookService = require('../services/book.service');
+const bookService = require('../services/Sach.service');
 
 // Thêm sách mới
 async function addBook(req, res) {
