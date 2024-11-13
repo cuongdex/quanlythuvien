@@ -5,6 +5,7 @@ const nhaXuatBanRouter = require('./app/routes/nhaXuatBan.routes');
 const bookRouter = require("./app/routes/book.routes");
 const docGiaRouter = require('./app/routes/docGia.routes');
 const muonTraSachRouter = require('./app/routes/muonTraSach.routes');
+const nhanVienRouter = require('./app/routes/nhanVien.routes');
 const app = express();
 
 app.use(cors());
@@ -13,6 +14,8 @@ app.use("/api", nhaXuatBanRouter);
 app.use("/api", bookRouter); 
 app.use("/api", docGiaRouter); 
 app.use("/api", muonTraSachRouter);
+app.use("/api", nhanVienRouter);
+
 
 
 app.get("/", (req, res) => {
