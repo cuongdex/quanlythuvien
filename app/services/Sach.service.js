@@ -25,9 +25,13 @@ async function updateBook(maSach, updatedData) {
 }
 
 // Xóa một sách dựa trên mã sách (MaSach)
-async function deleteBook(maSach) {
+async function deleteBook(_id) {
+    console.log(_id);
+    
     try {
-        const book = await Book.findOneAndDelete({ MaSach: maSach });
+        const book = await Book.findOneAndDelete({ _id: _id });
+        console.log(book);
+        
         if (!book) {
             return { success: false, message: 'Book not found' };
         }
@@ -52,10 +56,12 @@ async function getAllBooks() {
 // Lấy thông tin sách theo ID
 async function getBookById(bookId) {
     try {
-        const book = await Book.findById(bookId);  // Tìm sách theo ID
+        const book = await Book.findOne({MaSach: bookId});  // Tìm sách theo ID
         if (!book) {
             throw new Error('Book not found'); // Nếu không tìm thấy sách
         }
+
+        
         return book;  // Trả về thông tin sách nếu tìm thấy
     } catch (error) {
         throw new Error(error.message); // Ném lỗi nếu có vấn đề trong quá trình truy vấn

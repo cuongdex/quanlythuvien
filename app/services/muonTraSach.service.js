@@ -50,9 +50,14 @@ async function traCuuThongTinMuon(maDocGia) {
         if (thongTinMuon.length === 0) {
             return { success: true, message: 'Không có lịch sử mượn sách nào.', data: [] };
         }
-        let  = tongTienMuon = 0;
-        for (const item of thongTinMuon) {
+        let tongTienMuon = 0;
+        const dsSach = thongTinMuon.flatMap(item => item.dsSach);
+
+        // console.log("Danh sách sách đã mượn:", dsSach);
+
+        for (const item of dsSach) {
             // Tìm cuốn sách với mã sách tương ứng
+            
             const SachMuon = await Sach.findOne({ MaSach: item.maSach });
         
             if (SachMuon) {
@@ -71,8 +76,55 @@ async function traCuuThongTinMuon(maDocGia) {
     }
 }
 
+// Mượn nhiều sách (mỗi sách 1 quyển)
+async function muonNhieuSach(maDocGia, danhSachSach) {
+    try {
+        // Kiểm tra độc giả có tồn tại không
+        const docGia = await DocGia.findOne({ MaDocGia: maDocGia });
+        if (!docGia) {
+            throw new Error('Độc giả không tồn tại.');
+        }
+
+        // Kiểm tra từng sách và giảm số lượng
+        const dsSachMuon = [];
+        for (const item of danhSachSach) {
+            const sach = await Sach.findOne({ MaSach: item.maSach });
+            
+            
+            if (!sach) {
+                throw new Error(`Sách với mã ${item.maSach} không tồn tại.`);
+            }
+            if (sach.SoQuyen < 1) {
+                throw new Error(`Sách ${sach.TenSach} không còn trong kho.`);
+            }
+
+            // Giảm số lượng sách
+            sach.SoQuyen -= 1;
+            await sach.save()
+            
+            dsSachMuon.push({ maSach:  item.maSach  });
+        }
+        
+        console.log(dsSachMuon);
+        
+        const ngayMuon = new Date();
+        const theoDoiMuon = new TheoDoiMuonSach({
+            maDocGia,
+            dsSach: dsSachMuon,
+            ngayMuon
+        });
+
+        await theoDoiMuon.save();
+        return { success: true, message: 'Mượn sách thành công!', data: theoDoiMuon };
+    } catch (error) {
+        return { success: false, message: error.message };
+    }
+}
+
+
 module.exports = {
     muonSach,
     traSach,
-    traCuuThongTinMuon
+    traCuuThongTinMuon,
+    muonNhieuSach
 };

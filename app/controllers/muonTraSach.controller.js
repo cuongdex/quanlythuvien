@@ -30,8 +30,19 @@ async function traCuuThongTinMuon(req, res) {
         res.status(500).json({ success: false, message: error.message });
     }
 }
+
+async function muonNhieuSach(req, res) {
+    try {
+        const { maDocGia, danhSachSach } = req.body; // danhSachSach là một mảng { maSach }
+        const result = await MuonTraSachService.muonNhieuSach(maDocGia, danhSachSach);
+        res.status(result.success ? 200 : 400).json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
 module.exports = {
     muonSach,
     traSach,
-    traCuuThongTinMuon
+    traCuuThongTinMuon,
+    muonNhieuSach
 };

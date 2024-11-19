@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.post('/muon', MuonTraSachController.muonSach); // API mượn sách
 router.post('/tra', MuonTraSachController.traSach);   // API trả sách
+router.post('/muon-nhieu-sach', MuonTraSachController.muonNhieuSach);
 router.get('/tracuu/:maDocGia', MuonTraSachController.traCuuThongTinMuon); // API tra cứu thông tin mượn
 
 module.exports = router;

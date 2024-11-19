@@ -6,6 +6,7 @@ const bookRouter = require("./app/routes/book.routes");
 const docGiaRouter = require('./app/routes/docGia.routes');
 const muonTraSachRouter = require('./app/routes/muonTraSach.routes');
 const nhanVienRouter = require('./app/routes/nhanVien.routes');
+const authRouter = require('./app/routes/auth.routes'); 
 const app = express();
 
 app.use(cors());
@@ -15,7 +16,7 @@ app.use("/api", bookRouter);
 app.use("/api", docGiaRouter); 
 app.use("/api", muonTraSachRouter);
 app.use("/api", nhanVienRouter);
-
+app.use('/api', authRouter); 
 
 
 app.get("/", (req, res) => {
