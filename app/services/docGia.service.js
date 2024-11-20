@@ -3,7 +3,7 @@ const DocGia = require('../model/docGia.model');
 // Thêm mới một độc giả
 async function addDocGia(data) {
     try {
-        const existingDocGia = await DocGia.findOne({ maDocGia: data.maDocGia });
+        const existingDocGia = await DocGia.findOne({ MaDocGia: data.MaDocGia });
         if (existingDocGia) {
             return { success: false, message: 'Mã độc giả đã tồn tại.' };
         }

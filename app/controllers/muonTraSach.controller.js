@@ -1,5 +1,10 @@
 const MuonTraSachService = require('../services/muonTraSach.service');
 
+async function getAll(req, res) {
+    const result = await MuonTraSachService.getAll();
+    return res.status(result.success ? 200 : 500).json(result);
+}
+
 async function muonSach(req, res) {
     try {
         const data = req.body;
@@ -12,8 +17,8 @@ async function muonSach(req, res) {
 
 async function traSach(req, res) {
     try {
-        const { maDocGia, maSach } = req.body;
-        const result = await MuonTraSachService.traSach(maDocGia, maSach);
+        const { maDocGia } = req.body;
+        const result = await MuonTraSachService.traSach(maDocGia);
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -44,5 +49,6 @@ module.exports = {
     muonSach,
     traSach,
     traCuuThongTinMuon,
-    muonNhieuSach
+    muonNhieuSach,
+    getAll
 };

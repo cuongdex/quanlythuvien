@@ -2,6 +2,26 @@ const TheoDoiMuonSach = require('../model/TheoDoiMuonSach.model');
 const DocGia = require('../model/docGia.model');
 const Sach = require('../model/book.model');
 
+async function getAll() {
+    try {
+        const haha = await TheoDoiMuonSach.find();
+        const TenDocGiaList = []; // Mảng để lưu trữ tên độc giả
+        
+        for (let item of haha) {
+            let TenDocGia = await DocGia.find({ MaDocGia: item.maDocGia });
+            if (TenDocGia.length > 0) {
+                TenDocGiaList.push(TenDocGia[0].Ten); // Lưu tên độc giả vào mảng
+            } else {
+                TenDocGiaList.push(null); // Nếu không tìm thấy, thêm null vào mảng
+            }
+        }
+        
+        return { success: true, data: haha, Ten: TenDocGiaList };
+    } catch (error) {
+        return { success: false, message: error.message };
+    }
+}
+
 // Mượn sách
 async function muonSach(data) {
    
@@ -21,25 +41,33 @@ async function muonSach(data) {
     return { success: true, message: 'Mượn sách thành công' };
 }
 
-// Trả sách
-async function traSach(maDocGia, maSach) {
-    
+async function traSach(maDocGia) {
+    // Tìm độc giả
     const docGia = await DocGia.findOne({ MaDocGia: maDocGia });
-    const sach = await Sach.findOne({ MaSach: maSach });
-    const theoDoi = await TheoDoiMuonSach.findOne({ maDocGia:maDocGia, maSach:maSach, ngayTra: null });
-
     if (!docGia) throw new Error('Độc giả không tồn tại.');
-    if (!sach) throw new Error('Sách không tồn tại.');
+
+    // Tìm lịch sử mượn sách chưa được trả
+    const theoDoi = await TheoDoiMuonSach.findOne({ maDocGia: maDocGia, ngayTra: null });
     if (!theoDoi) throw new Error('Lịch sử mượn sách không tồn tại hoặc đã được trả.');
 
-    // Cập nhật ngày trả và số lượng sách
+    // Lưu thông tin sách mượn để cập nhật
+    for (const item of theoDoi.dsSach) {
+        const sach = await Sach.findOne({ MaSach: item.maSach });
+        if (!sach) throw new Error(`Sách với mã ${item.maSach} không tồn tại.`);
+        
+        // Cập nhật số lượng sách khi trả
+        sach.SoQuyen += 1;
+        await sach.save();
+    }
+
+    // Cập nhật ngày trả sách
     theoDoi.ngayTra = new Date();
-    sach.SoQuyen += 1;
-    await sach.save();
     await theoDoi.save();
 
     return { success: true, message: 'Trả sách thành công' };
 }
+
+
 
 async function traCuuThongTinMuon(maDocGia) {
     try {
@@ -88,6 +116,8 @@ async function muonNhieuSach(maDocGia, danhSachSach) {
         // Kiểm tra từng sách và giảm số lượng
         const dsSachMuon = [];
         for (const item of danhSachSach) {
+            console.log(item.maSach);
+            
             const sach = await Sach.findOne({ MaSach: item.maSach });
             
             
@@ -126,5 +156,6 @@ module.exports = {
     muonSach,
     traSach,
     traCuuThongTinMuon,
-    muonNhieuSach
+    muonNhieuSach,
+    getAll
 };

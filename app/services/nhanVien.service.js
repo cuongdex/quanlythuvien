@@ -40,13 +40,20 @@ async function getNhanVienById(maNhanVien) {
     }
 }
 
-// Cập nhật thông tin nhân viên
 async function updateNhanVien(maNhanVien, updatedData) {
     try {
-        const nhanVien = await NhanVien.findOneAndUpdate({MSNV: maNhanVien }, updatedData, { new: true });
+        // Tìm nhân viên theo MSNV
+        const nhanVien = await NhanVien.findOne({ MSNV: maNhanVien });
         if (!nhanVien) {
             throw new Error('Nhân viên không tồn tại.');
         }
+
+        // Gán các giá trị cập nhật
+        Object.assign(nhanVien, updatedData);
+
+        // Lưu nhân viên (sẽ kích hoạt middleware pre('save'))
+        await nhanVien.save();
+
         return { success: true, data: nhanVien, message: 'Thông tin nhân viên đã được cập nhật!' };
     } catch (error) {
         return { success: false, message: error.message };

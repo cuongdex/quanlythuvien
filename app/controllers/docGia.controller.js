@@ -11,12 +11,14 @@ async function getAllDocGia(req, res) {
 }
 
 async function getDocGiaById(req, res) {
+    console.log(req.params.id);
     const result = await DocGiaService.getDocGiaById(req.params.id);
     return res.status(result.success ? 200 : 404).json(result);
 }
 
 async function updateDocGia(req, res) {
     const result = await DocGiaService.updateDocGia(req.params.id, req.body);
+    
     return res.status(result.success ? 200 : 404).json(result);
 }
 
